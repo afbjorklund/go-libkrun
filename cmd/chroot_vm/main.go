@@ -30,8 +30,8 @@ func chrootVm(args []string) int {
 	newRoot := args[1]    // "rootfs_fedora"
 	guestArgv := args[2:] // []string{"/bin/sh"}
 
-	// Set the log level to "off".
-	e := krun.SetLogLevel(0)
+	// Set the log level to "warn".
+	e := krun.SetLogLevel(krun.LogLevelWarn)
 	if e != 0 {
 		errno = -e
 		perror("Error configuring log level")

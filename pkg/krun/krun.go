@@ -37,6 +37,57 @@ func AddDisk2(ctxId uint32, blockId string, diskPath string, diskFormat uint32, 
 	return
 }
 
+// krun_add_display
+func AddDisplay(ctxId uint32, width uint32, height uint32) (ret int32) {
+	_ctxId := C.uint32_t(ctxId)
+	_width := C.uint32_t(width)
+	_height := C.uint32_t(height)
+	_ret := C.krun_add_display(_ctxId, _width, _height)
+	ret = int32(_ret)
+	return
+}
+
+// krun_add_net_tap
+func AddNetTap(ctxId uint32, cTapName string, cMac *byte, features uint32, flags uint32) (ret int32) {
+	_ctxId := C.uint32_t(ctxId)
+	_cTapName := C.CString(cTapName)
+	defer C.free(unsafe.Pointer(_cTapName))
+	_cMac := (*C.uint8_t)(unsafe.Pointer(cMac))
+	_features := C.uint32_t(features)
+	_flags := C.uint32_t(flags)
+	_ret := C.krun_add_net_tap(_ctxId, _cTapName, _cMac, _features, _flags)
+	ret = int32(_ret)
+	return
+}
+
+// krun_add_net_unixgram
+func AddNetUnixgram(ctxId uint32, cPath string, fd int32, cMac *byte, features uint32, flags uint32) (ret int32) {
+	_ctxId := C.uint32_t(ctxId)
+	_cPath := C.CString(cPath)
+	defer C.free(unsafe.Pointer(_cPath))
+	_fd := C.int(fd)
+	_cMac := (*C.uint8_t)(unsafe.Pointer(cMac))
+	_features := C.uint32_t(features)
+	_flags := C.uint32_t(flags)
+	_ret := C.krun_add_net_unixgram(_ctxId, _cPath, _fd, _cMac, _features, _flags)
+	ret = int32(_ret)
+	return
+}
+
+// krun_add_net_unixstream
+func AddNetUnixstream(ctxId uint32, cPath string, fd int32, cMac *byte, features uint32, flags uint32) (ret int32) {
+	_ctxId := C.uint32_t(ctxId)
+	_cPath := C.CString(cPath)
+	defer C.free(unsafe.Pointer(_cPath))
+	_fd := C.int(fd)
+	_cMac := (*C.uint8_t)(unsafe.Pointer(cMac))
+	_features := C.uint32_t(features)
+	_flags := C.uint32_t(flags)
+	_ret := C.krun_add_net_unixstream(_ctxId, _cPath, _fd, _cMac, _features, _flags)
+	ret = int32(_ret)
+	return
+}
+
 // krun_add_virtiofs
 func AddVirtiofs(ctxId uint32, cTag string, cPath string) (ret int32) {
 	_ctxId := C.uint32_t(ctxId)
@@ -99,10 +150,90 @@ func CreateCtx() (ret int32) {
 	return
 }
 
+// krun_display_set_dpi
+func DisplaySetDpi(ctxId uint32, displayId uint32, dpi uint32) (ret int32) {
+	_ctxId := C.uint32_t(ctxId)
+	_displayId := C.uint32_t(displayId)
+	_dpi := C.uint32_t(dpi)
+	_ret := C.krun_display_set_dpi(_ctxId, _displayId, _dpi)
+	ret = int32(_ret)
+	return
+}
+
+// krun_display_set_edid
+func DisplaySetEdid(ctxId uint32, displayId uint32, edidBlob *byte, blobSize uint64) (ret int32) {
+	_ctxId := C.uint32_t(ctxId)
+	_displayId := C.uint32_t(displayId)
+	_edidBlob := (*C.uint8_t)(unsafe.Pointer(edidBlob))
+	_blobSize := C.size_t(blobSize)
+	_ret := C.krun_display_set_edid(_ctxId, _displayId, _edidBlob, _blobSize)
+	ret = int32(_ret)
+	return
+}
+
+// krun_display_set_physical_size
+func DisplaySetPhysicalSize(ctxId uint32, displayId uint32, widthMm uint16, heightMm uint16) (ret int32) {
+	_ctxId := C.uint32_t(ctxId)
+	_displayId := C.uint32_t(displayId)
+	_widthMm := C.uint16_t(widthMm)
+	_heightMm := C.uint16_t(heightMm)
+	_ret := C.krun_display_set_physical_size(_ctxId, _displayId, _widthMm, _heightMm)
+	ret = int32(_ret)
+	return
+}
+
+// krun_display_set_refresh_rate
+func DisplaySetRefreshRate(ctxId uint32, displayId uint32, refreshRate uint32) (ret int32) {
+	_ctxId := C.uint32_t(ctxId)
+	_displayId := C.uint32_t(displayId)
+	_refreshRate := C.uint32_t(refreshRate)
+	_ret := C.krun_display_set_refresh_rate(_ctxId, _displayId, _refreshRate)
+	ret = int32(_ret)
+	return
+}
+
 // krun_free_ctx
 func FreeCtx(ctxId uint32) (ret int32) {
 	_ctxId := C.uint32_t(ctxId)
 	_ret := C.krun_free_ctx(_ctxId)
+	ret = int32(_ret)
+	return
+}
+
+// krun_get_max_vcpus
+func GetMaxVcpus() (ret int32) {
+	_ret := C.krun_get_max_vcpus()
+	ret = int32(_ret)
+	return
+}
+
+// krun_init_log
+func InitLog(targetFd int32, level uint32, style uint32, options uint32) (ret int32) {
+	_targetFd := C.int(targetFd)
+	_level := C.uint32_t(level)
+	_style := C.uint32_t(style)
+	_options := C.uint32_t(options)
+	_ret := C.krun_init_log(_targetFd, _level, _style, _options)
+	ret = int32(_ret)
+	return
+}
+
+// krun_nitro_set_image
+func NitroSetImage(ctxId uint32, imagePath string, imageType uint32) (ret int32) {
+	_ctxId := C.uint32_t(ctxId)
+	_imagePath := C.CString(imagePath)
+	defer C.free(unsafe.Pointer(_imagePath))
+	_imageType := C.uint32_t(imageType)
+	_ret := C.krun_nitro_set_image(_ctxId, _imagePath, _imageType)
+	ret = int32(_ret)
+	return
+}
+
+// krun_nitro_set_start_flags
+func NitroSetStartFlags(ctxId uint32, startFlags uint64) (ret int32) {
+	_ctxId := C.uint32_t(ctxId)
+	_startFlags := C.uint64_t(startFlags)
+	_ret := C.krun_nitro_set_start_flags(_ctxId, _startFlags)
 	ret = int32(_ret)
 	return
 }
@@ -123,6 +254,16 @@ func SetDataDisk(ctxId uint32, diskPath string) (ret int32) {
 	_diskPath := C.CString(diskPath)
 	defer C.free(unsafe.Pointer(_diskPath))
 	_ret := C.krun_set_data_disk(_ctxId, _diskPath)
+	ret = int32(_ret)
+	return
+}
+
+// krun_set_display_backend
+func SetDisplayBackend(ctxId uint32, displayBackend uintptr, backendSize uint64) (ret int32) {
+	_ctxId := C.uint32_t(ctxId)
+	_displayBackend := unsafe.Pointer(displayBackend)
+	_backendSize := C.size_t(backendSize)
+	_ret := C.krun_set_display_backend(_ctxId, _displayBackend, _backendSize)
 	ret = int32(_ret)
 	return
 }
@@ -291,6 +432,20 @@ func SetRootDisk(ctxId uint32, diskPath string) (ret int32) {
 	_diskPath := C.CString(diskPath)
 	defer C.free(unsafe.Pointer(_diskPath))
 	_ret := C.krun_set_root_disk(_ctxId, _diskPath)
+	ret = int32(_ret)
+	return
+}
+
+// krun_set_root_disk_remount
+func SetRootDiskRemount(ctxId uint32, device string, fstype string, options string) (ret int32) {
+	_ctxId := C.uint32_t(ctxId)
+	_device := C.CString(device)
+	defer C.free(unsafe.Pointer(_device))
+	_fstype := C.CString(fstype)
+	defer C.free(unsafe.Pointer(_fstype))
+	_options := C.CString(options)
+	defer C.free(unsafe.Pointer(_options))
+	_ret := C.krun_set_root_disk_remount(_ctxId, _device, _fstype, _options)
 	ret = int32(_ret)
 	return
 }
