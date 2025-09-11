@@ -1,4 +1,4 @@
-//go:build !sev && !efi
+//go:build !sev && !tdx && !efi
 package krun
 
 /*
