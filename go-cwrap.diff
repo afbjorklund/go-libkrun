@@ -1,0 +1,90 @@
+diff --git a/intf.go b/intf.go
+index 5de9f40..67e21c9 100644
+--- a/intf.go
++++ b/intf.go
+@@ -169,6 +169,7 @@ func (conv *convImpl) ToGo(w io.Writer, assign, g, c, gtype string) {
+ 
+ var (
+ 	NumConv = &convImpl{conv, conv}
++	BoolConv = &convImpl{conv, conv}
+ 	PtrConv = &convImpl{convPtr, convPtr}
+ 	ValConv = &convImpl{convValue, convValue}
+ )
+diff --git a/parse.go b/parse.go
+index fdea562..b347551 100644
+--- a/parse.go
++++ b/parse.go
+@@ -48,6 +48,8 @@ func (pac *Package) getEqualType(gt gcc.Type, declare bool) EqualType {
+ 	case *gcc.FundamentalType:
+ 		if t.CName() == "void" {
+ 			return &Void{}
++		} else if t.CName() == "bool" {
++			return newBool(t)
+ 		} else {
+ 			return newNum(t)
+ 		}
+@@ -120,7 +122,7 @@ func (pac *Package) declareEqualType(gt gcc.Type) EqualType {
+ func (pac *Package) getType(gt gcc.Type, ptrKind gcc.PtrKind) Type {
+ 	if ptrKind == gcc.NotSet {
+ 		if named, ok := gt.(gcc.Named); ok && pac.isBool(named.CName()) {
+-			return newBool(pac.declareEqualType(gt).CgoName())
++			return newIntBool(pac.declareEqualType(gt).CgoName())
+ 		}
+ 		return pac.declareEqualType(gt)
+ 	}
+@@ -350,8 +352,16 @@ func (pac *Package) newVariable(t *gcc.Variable) *Variable {
+ 	return v
+ }
+ 
+-func newBool(cgoName string) *Bool {
+-	return &Bool{baseType{
++func newBool(t *gcc.FundamentalType) *Bool {
++	return &Bool{baseEqualType{
++		"bool",
++		"C.bool",
++		t.Size(),
++		BoolConv}}
++}
++
++func newIntBool(cgoName string) *IntBool {
++	return &IntBool{baseType{
+ 		"bool",
+ 		cgoName,
+ 	}}
+@@ -450,7 +460,7 @@ func generalIntFilter(n string) string {
+ 	switch n {
+ 	case "int32", "uint32":
+ 	case "int64", "uint64":
+-		return "int"
++		//return "int"
+ 	}
+ 	return n
+ }
+diff --git a/unnamed.go b/unnamed.go
+index 149eef7..be51726 100644
+--- a/unnamed.go
++++ b/unnamed.go
+@@ -38,17 +38,21 @@ type Num struct {
+ }
+ 
+ type Bool struct {
++	baseEqualType
++}
++
++type IntBool struct {
+ 	baseType
+ }
+ 
+-func (n *Bool) ToCgo(w io.Writer, assign, g, c string) {
++func (n *IntBool) ToCgo(w io.Writer, assign, g, c string) {
+ 	conv(w, ":", "0", c, n.CgoName())
+ 	fp(w, "if ", g, " {")
+ 	conv(w, "", "1", c, n.CgoName())
+ 	fp(w, "}")
+ }
+ 
+-func (n *Bool) ToGo(w io.Writer, assign, g, c string) {
++func (n *IntBool) ToGo(w io.Writer, assign, g, c string) {
+ 	conv(w, assign, c+"==1", g, n.GoName())
+ }
+ 
